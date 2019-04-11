@@ -57,10 +57,19 @@ int main(int argc, char** argv) {
       Dictionary[filecontent[i]].increaseFrequency();
     }
   }
-  map<char, node>::iterator itr;
-  for(itr=Dictionary.begin();itr!=Dictionary.end();itr++)
-  {
-    cout<<(*itr).first<<" : "<<(*itr).second.getFrequency()<<endl;
+  map<char, node>::iterator mapitr;
+  vector<node> Tree;
+  vector<node>:: iterator vecitr;
+  for(mapitr=Dictionary.begin();mapitr!=Dictionary.end();mapitr++){
+    node newnode;
+    string s;
+    s.push_back((*mapitr).first);
+    newnode.setCode(s);
+    newnode.setFrequency((*mapitr).second.getFrequency());
+    Tree.push_back(newnode);
+  }
+  for(vecitr=Tree.begin();vecitr!=Tree.end();vecitr++){
+    cout<<(*vecitr).getCode()<<" "<<(*vecitr).getFrequency()<<endl;
   }
   return 0;
 }
