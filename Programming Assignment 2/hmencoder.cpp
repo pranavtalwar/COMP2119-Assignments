@@ -35,6 +35,24 @@ public:
     this->code = addString + this->code;
   }
 };
+
+
+bool compare(const Node a, const Node b){
+  if(a.getFrequency() == b.getFrequency()){
+    if(a.getCode().length() == b.getCode().length()){
+      int asciisum1 = 0, asciisum2 = 0;
+      for(int i=0;i<a.getCode().length();i++){
+        asciisum1+=a.getCode()[i];
+      }
+      for(int i=0;i<b.getCode().length();i++){
+        asciisum2+=b.getCode()[i];
+      }
+      return asciisum1 > asciisum2;
+    }
+    return a.getCode().length() < b.getCode().length();
+  }
+  return a.getFrequency() < b.getFrequency();
+}
 int main(int argc, char** argv) {
   string filecontent;
   string sentence;
@@ -68,8 +86,8 @@ int main(int argc, char** argv) {
     newnode.setFrequency((*mapitr).second.getFrequency());
     Tree.push_back(newnode);
   }
-  for(vecitr=Tree.begin();vecitr!=Tree.end();vecitr++){
-    cout<<(*vecitr).getCode()<<" "<<(*vecitr).getFrequency()<<endl;
+  while(Tree.size() > 1){
+
   }
   return 0;
 }
