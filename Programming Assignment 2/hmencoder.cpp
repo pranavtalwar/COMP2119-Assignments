@@ -4,8 +4,9 @@
 #include<vector>
 #include<fstream>
 #include<cstdlib>
-#include<map>
 #include<iterator>
+#include<algorithm>
+#include<iomanip>
 using namespace std;
 class node{
 private:
@@ -39,14 +40,14 @@ public:
 
 bool compare(const node &a, const node &b){
   if(a.getFrequency() == b.getFrequency()){
-      int asciimin1 = 0, asciimin2 = 0;
-      for(int i=0;i<a.getCode().length();i++){
-        if(asciimin1<=a.getCode()[i]){
+      int asciimin1 = a.getCode()[0], asciimin2 = b.getCode()[0];
+      for(int i=1;i<a.getCode().length();i++){
+        if(asciimin1>=a.getCode()[i]){
           asciimin1 = a.getCode()[i];
         }
       }
-      for(int i=0;i<b.getCode().length();i++){
-        if(asciimin2<=b.getCode()[i]){
+      for(int i=1;i<b.getCode().length();i++){
+        if(asciimin2>=b.getCode()[i]){
           asciimin2 = b.getCode()[i];
         }
       }
@@ -56,7 +57,7 @@ bool compare(const node &a, const node &b){
 }
 int main(int argc, char** argv) {
   string filecontent;
-  /*string sentence;
+  string sentence;
   ifstream ifile;
   string filetoread = argv[1];
   ofstream ofile1, ofile2;
@@ -66,8 +67,7 @@ int main(int argc, char** argv) {
   while(getline(ifile,sentence)){
     filecontent+=sentence;
   }
-  ifile.close();*/
-  filecontent = "I don't like programming!";
+  ifile.close();
   map<char, node> Dictionary;
   for(int i=0;i<filecontent.length();i++){
     if(Dictionary.find(filecontent[i])==Dictionary.end()){
@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
     newnode.setFrequency((*mapitr).second.getFrequency());
     Tree.push_back(newnode);
   }
+  sort(Tree.begin(), Tree.end(), compare);
   while(Tree.size() > 1){
     sort(Tree.begin(), Tree.end(), compare);
     int newFreq = Tree[0].getFrequency() + Tree[1].getFrequency();
@@ -125,15 +126,36 @@ int main(int argc, char** argv) {
     Tree.erase(Tree.begin(),Tree.begin()+2);
   }
   string Huffmanstring = "";
-  int bitsused = 0;
+  float bitsused = 0;
   for(int i=0;i<filecontent.length();i++){
     Huffmanstring+=Dictionary[filecontent[i]].getCode();
     bitsused+=Dictionary[filecontent[i]].getCode().length();
   }
-  for(mapitr=Dictionary.begin();mapitr!=Dictionary.end();mapitr++){
-    cout<<(*mapitr).first<<" : "<<(*mapitr).second.getCode()<<endl;
+  int counter = 0;
+  for(int i = 0 ; i< Huffmanstring.length() ; i++)
+  {
+      ofile2<<Huffmanstring[i];
+      counter++;
+      if(counter == 80)
+      {
+          ofile2<<endl;
+          counter=0;
+      }
   }
-  cout<<Huffmanstring<<endl;
-  cout<<bitsused<<endl;
+  for(mapitr=Dictionary.begin();mapitr!=Dictionary.end();mapitr++)
+   {
+       string name;
+       string hmcodes;
+       name = (*mapitr).first;
+       if(name==" ")
+       {
+           name = "Space";
+       }
+       hmcodes = (*mapitr).second.getCode();
+       ofile1<<name<<": "<<hmcodes<<endl;
+   }
+  ofile1<<"Ave = "<<setprecision(3)<<bitsused/filecontent.length()<<" bits per symbol";
+  ofile2.close();
+  ofile1.close();
   return 0;
 }
