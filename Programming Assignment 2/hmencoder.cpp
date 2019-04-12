@@ -16,46 +16,47 @@ public:
     code = "";
     frequency = 1;
   }
-  void setCode(string code){
+  void setCode (string code){
     this->code = code;
   }
-  void setFrequency(int frequency){
+  void setFrequency (int frequency){
     this->frequency = frequency;
   }
-  string getCode(){
+  string getCode() const{
     return this->code;
   }
-  int getFrequency(){
+  int getFrequency() const {
     return this->frequency;
   }
   void increaseFrequency(){
     this->frequency++;
   }
-  void addCode(string addString){
+  void addCode(string addString) {
     this->code = addString + this->code;
   }
 };
 
 
-bool compare(const Node a, const Node b){
+bool compare(const node &a, const node &b){
   if(a.getFrequency() == b.getFrequency()){
-    if(a.getCode().length() == b.getCode().length()){
-      int asciisum1 = 0, asciisum2 = 0;
+      int asciimin1 = 0, asciimin2 = 0;
       for(int i=0;i<a.getCode().length();i++){
-        asciisum1+=a.getCode()[i];
+        if(asciimin1<=a.getCode()[i]){
+          asciimin1 = a.getCode()[i];
+        }
       }
       for(int i=0;i<b.getCode().length();i++){
-        asciisum2+=b.getCode()[i];
+        if(asciimin2<=b.getCode()[i]){
+          asciimin2 = b.getCode()[i];
+        }
       }
-      return asciisum1 > asciisum2;
-    }
-    return a.getCode().length() < b.getCode().length();
+      return asciimin1 < asciimin2;
   }
   return a.getFrequency() < b.getFrequency();
 }
 int main(int argc, char** argv) {
   string filecontent;
-  string sentence;
+  /*string sentence;
   ifstream ifile;
   string filetoread = argv[1];
   ofstream ofile1, ofile2;
@@ -65,6 +66,8 @@ int main(int argc, char** argv) {
   while(getline(ifile,sentence)){
     filecontent+=sentence;
   }
+  ifile.close();*/
+  filecontent = "I don't like programming!";
   map<char, node> Dictionary;
   for(int i=0;i<filecontent.length();i++){
     if(Dictionary.find(filecontent[i])==Dictionary.end()){
@@ -87,7 +90,50 @@ int main(int argc, char** argv) {
     Tree.push_back(newnode);
   }
   while(Tree.size() > 1){
-
+    sort(Tree.begin(), Tree.end(), compare);
+    int newFreq = Tree[0].getFrequency() + Tree[1].getFrequency();
+    string newCode;
+    string left = Tree[0].getCode(), right = Tree[1].getCode();
+    int ascii1 = left[0], ascii2 = right[0];
+    for(int i=1;i<left.length();i++){
+      if(ascii1>left[i]){
+        ascii1 = left[i];
+      }
+    }
+    for(int i=1;i<right.length();i++){
+      if(ascii2>right[i]){
+        ascii2 = right[i];
+      }
+    }
+    if(ascii1>ascii2){
+      string mid;
+      mid = left;
+      left = right;
+      right = mid;
+    }
+    newCode = left + right;
+    node newnode;
+    newnode.setCode(newCode);
+    newnode.setFrequency(newFreq);
+    Tree.push_back(newnode);
+    for(int i=0;i<left.length();i++){
+      Dictionary[left[i]].addCode("0");
+    }
+    for(int j=0;j<right.length();j++){
+      Dictionary[right[j]].addCode("1");
+    }
+    Tree.erase(Tree.begin(),Tree.begin()+2);
   }
+  string Huffmanstring = "";
+  int bitsused = 0;
+  for(int i=0;i<filecontent.length();i++){
+    Huffmanstring+=Dictionary[filecontent[i]].getCode();
+    bitsused+=Dictionary[filecontent[i]].getCode().length();
+  }
+  for(mapitr=Dictionary.begin();mapitr!=Dictionary.end();mapitr++){
+    cout<<(*mapitr).first<<" : "<<(*mapitr).second.getCode()<<endl;
+  }
+  cout<<Huffmanstring<<endl;
+  cout<<bitsused<<endl;
   return 0;
 }
